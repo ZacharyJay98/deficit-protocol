@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Deficit Protocol - Interactive Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slide {
+            position: absolute;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: white;
+            color: #2c3e50;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 60px;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .slide.prev {
+            transform: translateX(-100px);
+        }
+        
+        /* Title Slide */
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .main-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -2px;
+        }
+        
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 300;
+            font-style: italic;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+        
+        .author-info {
+            font-size: 1.5rem;
+            margin-top: 60px;
+            font-weight: 600;
+        }
+        
+        /* Content Slides */
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 600;
+            color: #34495e;
+            margin: 30px 0 20px 0;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin: 25px 0 15px 0;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid #e9ecef;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        ul {
+            margin: 20px 0 20px 30px;
+        }
+        
+        li {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            border-left: 5px solid #667eea;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        
+        .phase-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin: 40px 0 30px 0;
+        }
+        
+        .phase-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .phase-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 8px 0 0 0;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .social-handle {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-btn:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.6s ease;
+            z-index: 1000;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                width: 95%;
+                height: 90vh;
+                padding: 40px 30px;
+            }
+            
+            .nav-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="slide-counter" id="slideCounter">1 / 7</div>
+        
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active" data-slide="1">
+            <h1 class="main-title">THE DEFICIT PROTOCOL</h1>
+            <p class="subtitle">"A year-long journey to lose over 50 pounds without losing strength"</p>
+            <div class="author-info">
+                <p>@sThreadofDamocles</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introduction -->
+        <div class="slide" data-slide="2">
+            <h1>Introduction</h1>
+            
+            <p>As a powerlifter who reached 251 pounds, I thought I had two choices: stay strong but heavy, or get lean but weak. I was wrong.</p>
+            
+            <p>Over the course of one year, I lost 56 pounds while maintaining my strength and muscle mass. This wasn't about extreme measures, crash diets, or spending hours doing cardio. It was about understanding the fundamentals and staying consistent.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">251</span>
+                    <div class="stat-label">Starting Weight</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">195</span>
+                    <div class="stat-label">Final Weight</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">56</span>
+                    <div class="stat-label">Pounds Lost</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">12%</span>
+                    <div class="stat-label">Body Fat %</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <p><strong>The Protocol Philosophy:</strong> "You don't need to be perfect, just consistent. Small changes compound into massive results when you stick with them long enough."</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Phase 1 -->
+        <div class="slide" data-slide="3">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 1: The Foundation</h2>
+                <p class="phase-subtitle">251 to 220 lbs • Duration: 6 months</p>
+            </div>
+            
+            <h3>The Starting Point</h3>
+            <p>I began this journey eating around 4,000 calories per day—the intake I needed to fuel heavy powerlifting sessions and maintain my 251-pound frame. The first phase was all about establishing sustainable habits without shocking my system.</p>
+            
+            <h3>What I Did</h3>
+            <ul>
+                <li><strong>Gradual calorie reduction:</strong> Started at 4,000 calories and slowly dropped to 2,100 over 6 months</li>
+                <li><strong>No cardio:</strong> Zero additional cardio beyond my regular lifting</li>
+                <li><strong>Maintained lifting schedule:</strong> Continued my 5x/week powerlifting routine</li>
+                <li><strong>Protein priority:</strong> Kept protein at 1g per pound of body weight</li>
+                <li><strong>Consistent tracking:</strong> Weighed and logged every single thing I ate</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <p><strong>Key Insight:</strong> The gradual approach prevented metabolic adaptation and made the process feel manageable. I never felt deprived or like I was "dieting."</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Phase 2 -->
+        <div class="slide" data-slide="4">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 2: Adding Movement</h2>
+                <p class="phase-subtitle">220 to 205 lbs • Duration: 4 months</p>
+            </div>
+            
+            <h3>The Game Changer: Daily Steps</h3>
+            <p>With my weight loss stalling around 220 pounds, I knew I needed to increase my energy expenditure. Instead of traditional cardio, I focused on something much more sustainable: walking.</p>
+            
+            <h3>What I Added</h3>
+            <ul>
+                <li><strong>10,000 steps daily:</strong> Non-negotiable daily step goal</li>
+                <li><strong>Multiple walking sessions:</strong> Morning walk, lunch break walk, evening walk</li>
+                <li><strong>Standing desk + walkpad:</strong> Walked while working (productivity hack!)</li>
+                <li><strong>Maintained 2,100 calories:</strong> Didn't reduce calories further</li>
+                <li><strong>Same lifting schedule:</strong> Still hitting the gym 5x/week</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <p><strong>Pro Tip:</strong> Walking while working was a game-changer. I could get 3,000-4,000 steps during work hours without taking extra time out of my day.</p>
+            </div>
+            
+            <h3>Why Walking Works</h3>
+            <p>Walking is the most underrated fat loss tool. It's low impact, doesn't interfere with recovery from lifting, and can be done anywhere. Unlike high-intensity cardio, walking doesn't increase appetite or stress hormones.</p>
+        </div>
+
+        <!-- Slide 5: Phase 3 -->
+        <div class="slide" data-slide="5">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 3: The Final Push</h2>
+                <p class="phase-subtitle">205 to 195 lbs • Duration: 2 months</p>
+            </div>
+            
+            <h3>Getting Lean</h3>
+            <p>The final phase was about achieving that lean, defined look. At 205 pounds, I was already looking good, but I wanted to push to see how lean I could get while maintaining my strength.</p>
+            
+            <h3>The Final Adjustments</h3>
+            <ul>
+                <li><strong>Dropped to 1,800 calories:</strong> My lowest calorie intake of the entire journey</li>
+                <li><strong>Maintained 10K+ steps:</strong> Walking remained my primary cardio</li>
+                <li><strong>Consistent lifting:</strong> Kept strength training as my priority</li>
+                <li><strong>Precision tracking:</strong> Every gram counted at this stage</li>
+                <li><strong>Patience:</strong> Weight loss was slower but fat loss continued</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <p><strong>Important Note:</strong> At this low body fat level, the scale doesn't tell the whole story. I was losing fat and potentially gaining muscle simultaneously.</p>
+            </div>
+            
+            <h3>Results</h3>
+            <p>In just 2 months, I reached 195 pounds and approximately 11-12% body fat. The transformation was complete: 56 pounds lost over 12 months while maintaining my strength and muscle mass.</p>
+        </div>
+
+        <!-- Slide 6: Realistic Takeaway & Food Hacks -->
+        <div class="slide" data-slide="6">
+            <h1>The Realistic Takeaway</h1>
+            
+            <h2>What You Actually Need</h2>
+            <p>After completing this year-long transformation, here's what actually matters:</p>
+            
+            <h3>Training: Less is More</h3>
+            <ul>
+                <li><strong>2-3 full-body strength sessions per week</strong></li>
+                <li><strong>Focus on compound movements:</strong> squats, deadlifts, presses, rows</li>
+                <li><strong>Consistency over intensity:</strong> showing up matters more than perfect workouts</li>
+            </ul>
+            
+            <h3>My Personal Fat Loss Hacks</h3>
+            <ul>
+                <li><strong>Diet soda:</strong> satisfied cravings without calories</li>
+                <li><strong>Black coffee:</strong> appetite suppressant and energy booster</li>
+                <li><strong>Peppermints:</strong> reset palate and killed cravings</li>
+                <li><strong>10,000+ steps daily:</strong> walking is all the cardio you need</li>
+                <li><strong>1g protein per lb body weight:</strong> non-negotiable</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <p><strong>The Golden Rule:</strong> Consistency beats complexity every single time. A simple plan followed consistently will always outperform a complex plan followed sporadically.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Final Notes & CTA -->
+        <div class="slide" data-slide="7">
+            <h1>Your Journey Starts Now</h1>
+            
+            <h2>What This Journey Taught Me</h2>
+            <p>Losing 56 pounds while maintaining strength isn't about having perfect genetics or unlimited willpower. It's about understanding the fundamentals and applying them consistently over time.</p>
+            
+            <p>The most important lesson? You don't need to be perfect. You just need to be consistent.</p>
+            
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li><strong>Start with a moderate calorie deficit</strong></li>
+                <li><strong>Prioritize protein at every meal</strong></li>
+                <li><strong>Walk more—aim for 10,000 steps daily</strong></li>
+                <li><strong>Lift weights 2-3 times per week</strong></li>
+                <li><strong>Track your food honestly and consistently</strong></li>
+                <li><strong>Be patient—results take time</strong></li>
+            </ul>
+            
+            <div class="cta-section">
+                <h2>Stay Connected</h2>
+                <p>Want more no-BS fat loss tips and updates on my continued journey?</p>
+                <p class="social-handle">Follow @itsgivingdeadlift</p>
+                <p>For weekly content on sustainable fat loss, strength training, and real-world nutrition advice.</p>
+            </div>
+            
+            <p><strong>Thank you for reading The Deficit Protocol. Now stop reading and start doing. Your transformation is waiting.</strong></p>
+        </div>
+        
+        <div class="nav-container">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+        
+        function updateSlide() {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active', 'prev');
+            });
+            
+            const current = document.querySelector(`[data-slide="${currentSlide}"]`);
+            current.classList.add('active');
+            
+            for (let i = 1; i < currentSlide; i++) {
+                const prevSlide = document.querySelector(`[data-slide="${i}"]`);
+                if (prevSlide) prevSlide.classList.add('prev');
+            }
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide} / ${totalSlides}`;
+            
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            
+            if (currentSlide === totalSlides) {
+                document.getElementById('nextBtn').textContent = 'Restart';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next →';
+            }
+        }
+        
+        function changeSlide(direction) {
+            if (direction === 1) {
+                if (currentSlide < totalSlides) {
+                    currentSlide++;
+                } else {
+                    currentSlide = 1;
+                }
+            } else {
+                if (currentSlide > 1) {
+                    currentSlide--;
+                }
+            }
+            updateSlide();
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+        
+        updateSlide();
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    changeSlide(1);
+                } else {
+                    changeSlide(-1);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
